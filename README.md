@@ -42,4 +42,21 @@ Now lets finally understand what is an container
 - So then a  image call a startup command that will create an copy of all the instruction of the resources on Your computer
 - The running these commands will create seperate resources and start using it
 - No other app will be interupted by these Commands and no other app can access these resources
-- SO you created a isolated computer inside your computer ( virtual machine) to run some tasks and that is ladies and gentleman called container 
+- SO you created a isolated computer inside your computer ( virtual machine) to run some tasks and that is ladies and gentleman called container
+- 
+
+
+### Chapter 2 
+# Lets run some code 
+
+Docker HUb: Docker Hub is a cloud-based repository provided by Docker where you can find and share Docker images. It serves as a centralized platform for storing and discovering pre-built Docker images created by the community.
+
+To connect to Docker Hub from the terminal, you can follow these steps:
+
+1. Install Docker: First, make sure Docker is installed on your machine. You can [download](https://docs.docker.com/get-docker/) and install Docker according to the instructions for your operating system.
+   ``` docker --version``` to see whether it is installed properly 
+2. Open an account in [docker hub](https://hub.docker.com/)  Remember the username and password
+3. Open terminal and type ```docker login ```
+4. A prompt will show up to give your username and password. After giving a message will indicate you are connected to docker hub 
+
+Let print hello world 
