@@ -60,3 +60,43 @@ To connect to Docker Hub from the terminal, you can follow these steps:
 4. A prompt will show up to give your username and password. After giving a message will indicate you are connected to docker hub 
 
 Let print hello world 
+Run this on your terminal 
+``` docker run hello-world```
+
+What this will do?
+
+The docker run hello-world command is used to run a Docker container with the "hello-world" image. This command consists of two parts: the docker run command, which is used to start a container, and the image name hello-world, which refers to the specific Docker image you want to run.
+
+When you execute this command, Docker checks if the "hello-world" image is available on your local machine. If it is not present locally, Docker automatically searches for the image on Docker Hub, which is a public registry for Docker images. Docker Hub is the default registry, but you can also use other registries if needed.
+
+If the "hello-world" image is not found on your local machine, Docker pulls the image from Docker Hub to your local machine. The process of downloading the image is transparent to you, and Docker handles it automatically. Once the image is downloaded, Docker creates a container from that image and runs it.
+
+The "hello-world" image is a simple image that contains a small, self-contained program. When you run the image, it prints a "Hello from Docker!" message to the console. This image is commonly used as a quick test to verify that Docker is correctly installed and running on your machine.
+
+### Chapter 3
+# All the commands
+
+Now we will list all the necessary commands here . You can run them on your terminal and check whether its working like saide here
+
+- ``` docker run <container-name> ls ```  Replace conatainer name with you preferable container from docker hub  
+    It will list all the files that this image tells the machine to contain in itself aka all the files in the container
+- ``` docker ps ```
+    List all the running container in your machine
+- ``` docker create <image-id> ``` remove image id with your preferable image id from docker hub
+This creates all the necessary files but does not execute anything
+- ``` docker start -a <container-id> ``` . You can get the container id from ```docker ps --all```
+This one will start executing the container you created or the containers that are stopped
+- ``` docker system prune ```
+Removes all the containers from your machine . This is very important otherwise you machine will endup losing lots of stuff
+- ``` docker logs <container-id> ```
+Yes this just logs the output of the container
+- ``` docker stop <container-id> ```
+Yeah this one stops a container but gives it time to finish the current work or so
+- ``` docker kill <container-id> ```
+This one just kills it immediately
+- ``` docker exec -it <container-id> <commands> ```
+This command will execute any command on that container with input feature enabled
+- ``` docker exec -it <container-id> sh ```
+let you dicectly command your container without writing docker in front of them every time . sh is actually shell for that container
+
+ 
