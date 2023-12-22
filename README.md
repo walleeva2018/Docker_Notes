@@ -138,7 +138,7 @@ Publish our docker image in docker hub as well so can people from anywhere can u
 
 ![Build Process](https://devopscube.com/wp-content/uploads/2022/10/docker-build-workflow.png)
 
-## So me a example which I can run
+## Show me a example which I can run
 
 So lets code something. If you are too laze like me clone the following repo
 
@@ -152,7 +152,9 @@ And you localhost will show a to-do list. But we want it to be containarized so 
 So lets creat a Dockerfile in the same directory (`cd getting-started-app`)
 N.B The new file name is Dockerfile with no extension
 
-Write the following command
+Write the following command  
+
+## N.B The order of these commands matter . The reason behind it will be discussed in the last part of this chapter
 
 ```
 # syntax=docker/dockerfile:1
@@ -181,13 +183,13 @@ This line sets the working directory within the container to /app. Any subsequen
 
 # COPY . .:
 
-This line copies the contents of the current directory (where the Dockerfile is located) into the /app directory within the container. This includes your application code and any other files present in the same directory as the Dockerfile. ( in Our case not necessary )
+This line copies the contents of the current directory (where the Dockerfile is located) into the /app directory within the container. This includes your application code and any other files present in the same directory as the Dockerfile. 
 
-# RUN yarn install --production:
+# RUN yarn install --production (or  npm install ):
 
 This line executes the yarn install --production command inside the container. It installs the dependencies for the Node.js application. The --production flag ensures that only production dependencies (specified in package.json) are installed, excluding development dependencies.
 
-# CMD ["node", "src/index.js"]:
+# CMD ["node", "src/index.js"] (or ["npm", "start"]):
 
 This line specifies the default command to run when the container starts. In this case, it runs the Node.js application using the node command, with the entry point being src/index.js. Adjust this line based on the structure of your Node.js application.
 
@@ -217,7 +219,7 @@ The -p flag (short for --publish) creates a port mapping between the host and th
 
 Now go to localhost:3000 and you have your todo web app running . Congratulations
 
-But how it works actually ?
+But how it works actually ?  And why the order of commands are important?
 
 Lets go step by step
 
