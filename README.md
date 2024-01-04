@@ -230,3 +230,8 @@ Lets go step by step
 5. The CMD uses the container generated from RUN command and so on
 
 N.B after each step a new container is created and when next step is running previous container is killed . In this way after all steps only the final app reamins with all the dependencies needed.
+
+
+### Chapter 5
+
+# Docker Compuse and Volumes 
