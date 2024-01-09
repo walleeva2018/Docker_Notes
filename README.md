@@ -243,11 +243,11 @@ N.B after each step a new container is created and when next step is running pre
     docker-compose.yml: This is your blueprint, telling Docker how to build your application. Let's crack it open!
 
    ```
-   mkdir my-project`
+   mkdir my-project
    cd my-project
    ```
 
-Inside the Blueprint:
+Inside the Blueprint :
 
     Version: Choose the right version for your Docker engine, like a trusty compass guiding you through compatibility.
     Services: These are the building blocks of your application, like the chefs in your virtual kitchen. Each service gets its own container, specializing in its own task.
