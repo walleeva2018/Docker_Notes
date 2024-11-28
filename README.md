@@ -78,7 +78,7 @@ The "hello-world" image is a simple image that contains a small, self-contained 
 
 ### Chapter 3
 
-# All the commands
+# All the basic commands
 
 Now we will list all the necessary commands here . You can run them on your terminal and check whether its working like saide here
 
@@ -152,7 +152,7 @@ And you localhost will show a to-do list. But we want it to be containarized so 
 So lets creat a Dockerfile in the same directory (`cd getting-started-app`)
 N.B The new file name is Dockerfile with no extension
 
-Write the following command  
+Write the following command
 
 ## N.B The order of these commands matter . The reason behind it will be discussed in the last part of this chapter
 
@@ -183,9 +183,9 @@ This line sets the working directory within the container to /app. Any subsequen
 
 # COPY . .:
 
-This line copies the contents of the current directory (where the Dockerfile is located) into the /app directory within the container. This includes your application code and any other files present in the same directory as the Dockerfile. 
+This line copies the contents of the current directory (where the Dockerfile is located) into the /app directory within the container. This includes your application code and any other files present in the same directory as the Dockerfile.
 
-# RUN yarn install --production (or  npm install ):
+# RUN yarn install --production (or npm install ):
 
 This line executes the yarn install --production command inside the container. It installs the dependencies for the Node.js application. The --production flag ensures that only production dependencies (specified in package.json) are installed, excluding development dependencies.
 
@@ -219,7 +219,7 @@ The -p flag (short for --publish) creates a port mapping between the host and th
 
 Now go to localhost:3000 and you have your todo web app running . Congratulations
 
-But how it works actually ?  And why the order of commands are important?
+But how it works actually ? And why the order of commands are important?
 
 Lets go step by step
 
@@ -231,62 +231,6 @@ Lets go step by step
 
 N.B after each step a new container is created and when next step is running previous container is killed . In this way after all steps only the final app reamins with all the dependencies needed.
 
-
 ### Chapter 5
 
-# Docker Compuse and Volumes 
-
-## Step 1: Setting Up Your Project Basecamp:
-
-    Project Directory: Create a dedicated directory for your project. Think of it as your coding oasis, free from distractions and clutter.
-
-    docker-compose.yml: This is your blueprint, telling Docker how to build your application. Let's crack it open!
-
-   ```
-   mkdir my-project
-   cd my-project
-   ```
-
-Inside the Blueprint :
-
-    Version: Choose the right version for your Docker engine, like a trusty compass guiding you through compatibility.
-    Services: These are the building blocks of your application, like the chefs in your virtual kitchen. Each service gets its own container, specializing in its own task.
-    Volumes: Think of them as storage pantries, holding onto your data even when containers come and go. Persistent and reliable, just like your favorite grandma's cookie jar.
-
-Step 2: Building Your First Service (with Nginx as Our Culinary Star):
-
-    Image: Imagine pre-made pizza dough! We'll use the nginx:latest image, like a base for crafting our web serving masterpiece.
-    Volumes: Time to mount those pantries! We'll link a named volume called app-data to the container's /usr/share/nginx/html directory, the heart of Nginx's serving domain.
-
-Creating the Pantry (app-data):
-
-Declare your named volume in the volumes section. Think of it as labeling your cookie jar!
-
-Step 3: Let's Bake Some Content (the index.html file):
-
-Write some HTML code, like a delicious recipe. Save it as index.html, ready to be served piping hot!
-
-Step 4: Fire Up the Containers (docker-compose up -d):
-
-Time to get cooking! This command spins up your services (containers) in the background, like efficient kitchen robots.
-
-Step 5: Feast Your Eyes (Accessing the Application):
-
-Open your web browser, point it to http://localhost, and savor the fruits of your labor! The index.html content should proudly greet you.
-
-Step 6: Persistence Test (Updating and Observing):
-
-    Modify the index.html file, adding a new ingredient to your recipe.
-    Refresh the web page. Did the change magically appear? That's the power of volumes! Even when you restart the containers (like washing the dishes), your data stays put.
-
-Step 7: Cleaning Up (docker-compose down):
-
-When you're done, you can stop and remove all containers with this command. Think of it as putting away the leftovers for later.
-
-Step 8: Persistence Checkmate (Rebooting and Verifying):
-
-Run docker-compose up -d again to bring your containers back to life. Visit the web page once more. Is your updated recipe still there? Volumes win the persistence game!
-
-Beyond the Basics:
-
-This is just the beginning of your Docker Compose and volume adventure! Explore different volume types, learn how to manage them like a pro, and unleash the full potential of persistent data in your multi-container applications. Remember, safety and ethical development are always paramount, so keep learning, exploring, and building responsibly!
+# Docker Compuse
