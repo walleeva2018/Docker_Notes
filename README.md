@@ -107,130 +107,530 @@ Now we will list all the necessary commands here . You can run them on your term
 
 # Create Your own docker image
 
-#### There are mainly 3 step
+# Docker Tutorial - From Zero to Hero
 
-1. Create a base image
-2. Run some command on it to install necessary stuff
-3. Set some startup command
+## Step 1: Minimal Dockerfile (3 lines)
 
-## Step 1/3
+The absolute simplest Dockerfile to run our hello world:
 
-Now what is a base image is ?
-
-When you create a Docker container, you usually start with a base image that provides a certain environment. This image forms the foundation, and you can then customize and layer additional components on top of it by adding your application code, dependencies, and configurations.
-
-Example : Imagine you want to run a python app. Now someone in this world created a image in which there is a command to install necessary files to run python app. So you may want to start from it and install the dependencies using that image. Thats called the base Image
-
-## Step 2/3
-
-What should I run ?
-
-If your Python application has dependencies, you may need to install them. For example, let's say your application requires some additional Python packages, and you want to use the pip package manager to install them.
-
-## step 3/3
-
-What is the startup command ?
-
-You define the command that will be executed when the container starts.
-
-In the below example we can see we have the codes then we write a dockerfile to containarized our code , then if needed we can also
-Publish our docker image in docker hub as well so can people from anywhere can use our app
-
-![Build Process](https://devopscube.com/wp-content/uploads/2022/10/docker-build-workflow.png)
-
-## Show me a example which I can run
-
-So lets code something. If you are too laze like me clone the following repo
-
-`git clone https://github.com/docker/getting-started-app.git `
-
-You can see the codes inside it or visit the [repo](https://github.com/docker/getting-started-app/tree/main)
-
-We want to containarize this code or app. Remember this is a functional web app you can run it using npm or other command
-And you localhost will show a to-do list. But we want it to be containarized so that anyone can run it without the dependencies
-
-So lets creat a Dockerfile in the same directory (`cd getting-started-app`)
-N.B The new file name is Dockerfile with no extension
-
-Write the following command
-
-## N.B The order of these commands matter . The reason behind it will be discussed in the last part of this chapter
-
+```dockerfile
+FROM node:18
+COPY app.js .
+CMD ["node", "app.js"]
 ```
-# syntax=docker/dockerfile:1
 
-FROM node:18-alpine
+**Build and Run:**
+```bash
+docker build -t hello-world-v1 .
+docker run hello-world-v1
+```
+
+**Expected Output:**
+```
+Hello World from Docker!
+```
+
+**What you'll see during build:**
+- Downloads node:18 image (first time only)
+- Copies your app.js file
+- Creates the image
+
+**Try this too:**
+```bash
+# See what's inside the container
+docker run -it hello-world-v1 /bin/bash
+# Inside container: ls (you'll see app.js in root directory)
+# Type: exit
+```
+
+---
+
+## Step 2: Add Working Directory (4 lines)
+
+Let's organize files properly:
+
+```dockerfile
+FROM node:18
+WORKDIR /app
+COPY app.js .
+CMD ["node", "app.js"]
+```
+
+**Build and Run:**
+```bash
+docker build -t hello-world-v2 .
+docker run hello-world-v2
+```
+
+**Expected Output:**
+```
+Hello World from Docker!
+```
+
+**What changed:** Files now go into `/app` directory inside container
+
+**See the difference:**
+```bash
+# Compare with previous version
+docker run -it hello-world-v1 /bin/bash
+# Inside: ls (app.js is in root /)
+# exit
+
+docker run -it hello-world-v2 /bin/bash  
+# Inside: pwd (you're in /app)
+# Inside: ls (app.js is in /app)
+# exit
+```
+
+**Key Learning:** WORKDIR makes your container organized!
+
+---
+
+## Step 3: Better Copy Strategy (5 lines)
+
+Copy everything in current directory:
+
+```dockerfile
+FROM node:18
 WORKDIR /app
 COPY . .
-RUN yarn install --production
-CMD ["node", "src/index.js"]
 EXPOSE 3000
+CMD ["node", "app.js"]
 ```
 
-Lets understand each line
+**Build and Run:**
+```bash
+docker build -t hello-world-v3 .
+docker run hello-world-v3
+```
 
-# # syntax=docker/dockerfile:1:
+**Expected Output:**
+```
+Hello World from Docker!
+```
 
-This line specifies the syntax version of the Dockerfile. In this case, it's using version 1 of the experimental BuildKit syntax. The syntax version can affect how Docker interprets the instructions in the Dockerfile.
+**What changed:** 
+- `COPY . .` copies all files (including this Dockerfile!)
+- `EXPOSE 3000` documents which port we'll use (for web apps)
 
-# FROM node:18-alpine:
+**See what got copied:**
+```bash
+docker run -it hello-world-v3 /bin/bash
+# Inside: ls -la (you'll see Dockerfile, app.js, and any other files)
+# exit
+```
 
-This line sets the base image for the Dockerfile. It instructs Docker to use the official Node.js image version 18, based on the Alpine Linux distribution. Alpine Linux is a lightweight Linux distribution often used in Docker images to keep the image size minimal.
+**Test the EXPOSE (doesn't actually publish ports yet):**
+```bash
+# This still works the same way
+docker run hello-world-v3
+```
 
-# WORKDIR /app:
+**Key Learning:** COPY . . is convenient but copies everything! EXPOSE is just documentation.
 
-This line sets the working directory within the container to /app. Any subsequent instructions will be executed in this directory. It helps organize the file structure within the container.
+---
 
-# COPY . .:
+## Step 4: Add Package Management (7 lines)
 
-This line copies the contents of the current directory (where the Dockerfile is located) into the /app directory within the container. This includes your application code and any other files present in the same directory as the Dockerfile.
+For real Node.js apps with dependencies:
 
-# RUN yarn install --production (or npm install ):
+```dockerfile
+FROM node:18
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 3000
+CMD ["node", "app.js"]
+```
 
-This line executes the yarn install --production command inside the container. It installs the dependencies for the Node.js application. The --production flag ensures that only production dependencies (specified in package.json) are installed, excluding development dependencies.
+**First, create a package.json:**
+```bash
+echo '{"name":"hello-docker","version":"1.0.0","main":"app.js"}' > package.json
+```
 
-# CMD ["node", "src/index.js"] (or ["npm", "start"]):
+**Build and Run:**
+```bash
+docker build -t hello-world-v4 .
+docker run hello-world-v4
+```
 
-This line specifies the default command to run when the container starts. In this case, it runs the Node.js application using the node command, with the entry point being src/index.js. Adjust this line based on the structure of your Node.js application.
+**Expected Output:**
+```
+Hello World from Docker!
+```
 
-# EXPOSE 3000:
+**What changed:** 
+- Copy package.json first, then install dependencies
+- This creates better Docker layer caching
 
-This line informs Docker that the container will listen on port 3000 at runtime. It doesn't actually publish the port; it's more of a documentation feature. You would still need to use the -p option when running the container to publish the port to the host machine.
+**See the build difference:**
+```bash
+# Build again (should be faster due to caching)
+docker build -t hello-world-v4 .
+# Notice: "CACHED" appears for npm install step
+```
 
-So we have contanarized our code or someone else's code , well not yet. We need command it to execute
+**Explore the container:**
+```bash
+docker run -it hello-world-v4 /bin/bash
+# Inside: ls -la (see node_modules folder)
+# Inside: node --version
+# exit
+```
 
-`docker build -t getting-started .`
+**Key Learning:** Layer caching saves time! Install dependencies before copying code.
 
-The docker build command uses the Dockerfile to build a new image. You might have noticed that Docker downloaded a lot of "layers". This is because you instructed the builder that you wanted to start from the node:18-alpine image. But, since you didn't have that on your machine, Docker needed to download the image.
+---
 
-After Docker downloaded the image, the instructions from the Dockerfile copied in your application and used yarn to install your application's dependencies. The CMD directive specifies the default command to run when starting a container from this image.
+## Step 5: Add Environment Variables (9 lines)
 
-Finally, the -t flag tags your image. Think of this as a human-readable name for the final image. Since you named the image getting-started, you can refer to that image when you run a container.
+Make your app configurable:
 
-The . at the end of the docker build command tells Docker that it should look for the Dockerfile in the current directory.
+```dockerfile
+FROM node:18
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+ENV NODE_ENV=production
+ENV PORT=3000
+EXPOSE 3000
+CMD ["node", "app.js"]
+```
 
-Now any one can run this app with the following
+**Build and Run:**
+```bash
+docker build -t hello-world-v5 .
+docker run hello-world-v5
+```
 
-`docker run -dp 127.0.0.1:3000:3000 getting-started`
+**Expected Output:**
+```
+Hello World from Docker!
+```
 
-The -d flag (short for --detach) runs the container in the background. This means that Docker starts your container and returns you to the terminal prompt. You can verify that a container is running by viewing it in Docker Dashboard under Containers, or by running docker ps in the terminal.
+**What changed:** Set environment variables with `ENV`
 
-The -p flag (short for --publish) creates a port mapping between the host and the container. The -p flag takes a string value in the format of HOST:CONTAINER, where HOST is the address on the host, and CONTAINER is the port on the container. The command publishes the container's port 3000 to 127.0.0.1:3000 (localhost:3000) on the host. Without the port mapping, you wouldn't be able to access the application from the host.
+**Test environment variables:**
+```bash
+# Check the environment variables
+docker run -it hello-world-v5 /bin/bash
+# Inside: echo $NODE_ENV (should show: production)
+# Inside: echo $PORT (should show: 3000)
+# Inside: env | grep NODE (see all Node-related env vars)
+# exit
 
-Now go to localhost:3000 and you have your todo web app running . Congratulations
+# Override environment variables at runtime
+docker run -e NODE_ENV=development hello-world-v5
+# (Still same output, but env var is different inside)
 
-But how it works actually ? And why the order of commands are important?
+# Verify the override:
+docker run -it -e NODE_ENV=development hello-world-v5 /bin/bash
+# Inside: echo $NODE_ENV (should show: development)
+# exit
+```
 
-Lets go step by step
+**Key Learning:** ENV sets defaults, but you can override them with -e flag!
 
-1. The From command get the image either from cache or docker hub
-2. Generate an image from it
-3. Run command uses this image to install necessary files . Note that the From command actually gives a container to run the command
-4. Run command build upon the base image that was provided by From . So now our base image has new files as well as old files as well
-5. The CMD uses the container generated from RUN command and so on
+---
 
-N.B after each step a new container is created and when next step is running previous container is killed . In this way after all steps only the final app reamins with all the dependencies needed.
+## Step 6: Use Alpine for Smaller Images (9 lines)
 
-### Chapter 5
+Same functionality, much smaller size:
 
-# Docker Compuse
+```dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+ENV NODE_ENV=production
+ENV PORT=3000
+EXPOSE 3000
+CMD ["node", "app.js"]
+```
+
+**Build and Run:**
+```bash
+docker build -t hello-world-v6 .
+docker run hello-world-v6
+```
+
+**Expected Output:**
+```
+Hello World from Docker!
+```
+
+**What changed:** `node:18-alpine` is much smaller than regular `node:18`
+
+**Compare image sizes:**
+```bash
+# Check the size difference
+docker images | grep hello-world
+# v5 (regular node): ~900MB
+# v6 (alpine): ~170MB - Much smaller!
+```
+
+**Explore Alpine differences:**
+```bash
+docker run -it hello-world-v6 /bin/sh  # Note: /bin/sh not /bin/bash
+# Inside: cat /etc/os-release (see Alpine Linux)
+# Inside: ls /bin/ (fewer tools available)
+# Inside: which bash (not found - Alpine uses sh)
+# exit
+
+# Compare with regular Ubuntu-based image:
+docker run -it hello-world-v5 /bin/bash
+# Inside: cat /etc/os-release (see Ubuntu/Debian)
+# exit
+```
+
+**Key Learning:** Alpine = smaller size, fewer tools. Use -sh instead of -bash!
+
+---
+
+## Step 7: Add Security - Non-root User (12 lines)
+
+Don't run as root for security:
+
+```dockerfile
+FROM node:18-alpine
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nodejs -u 1001
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+USER nodejs
+ENV NODE_ENV=production
+ENV PORT=3000
+EXPOSE 3000
+CMD ["node", "app.js"]
+```
+
+**Build and Run:**
+```bash
+docker build -t hello-world-v7 .
+docker run hello-world-v7
+```
+
+**Expected Output:**
+```
+Hello World from Docker!
+```
+
+**What changed:** Created user `nodejs` and switched to it with `USER`
+
+**See the security difference:**
+```bash
+# Check who's running the process in v6 (root)
+docker run -it hello-world-v6 /bin/sh
+# Inside: whoami (shows: root)
+# Inside: id (shows uid=0 - root user)
+# exit
+
+# Check who's running the process in v7 (nodejs user)
+docker run -it hello-world-v7 /bin/sh
+# Inside: whoami (shows: nodejs)
+# Inside: id (shows uid=1001 - non-root user)
+# Inside: ls -la (see file ownership)
+# exit
+```
+
+**Test permission restrictions:**
+```bash
+docker run -it hello-world-v7 /bin/sh
+# Inside: touch /etc/test-file (should fail - Permission denied)
+# Inside: touch test-file (should work - can write in /app)
+# exit
+```
+
+**Key Learning:** Non-root users can't modify system files - much safer!
+
+---
+
+## Step 8: Optimize Layer Caching (13 lines)
+
+Better performance when rebuilding:
+
+```dockerfile
+FROM node:18-alpine
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nodejs -u 1001
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY --chown=nodejs:nodejs . .
+USER nodejs
+ENV NODE_ENV=production
+ENV PORT=3000
+EXPOSE 3000
+HEALTHCHECK CMD curl -f http://localhost:3000 || exit 1
+CMD ["node", "app.js"]
+```
+
+**Build and Run:**
+```bash
+docker build -t hello-world-v8 .
+docker run hello-world-v8
+```
+
+**Expected Output:**
+```
+Hello World from Docker!
+```
+
+**What changed:** 
+- `npm ci` instead of `npm install` (faster, reliable)
+- `--chown=nodejs:nodejs` sets file ownership
+- Added `HEALTHCHECK`
+
+**Test npm ci vs npm install:**
+```bash
+# Time the difference (npm ci is faster for production)
+time docker build -t hello-world-v8-test .
+```
+
+**Check file ownership:**
+```bash
+docker run -it hello-world-v8 /bin/sh
+# Inside: ls -la (all files owned by nodejs:nodejs)
+# exit
+
+# Compare with v7:
+docker run -it hello-world-v7 /bin/sh  
+# Inside: ls -la (files owned by root, but running as nodejs)
+# exit
+```
+
+**Test health check:**
+```bash
+# For this simple app, healthcheck will fail (no web server)
+# But you can see it in container inspect:
+docker run -d --name health-test hello-world-v8
+sleep 35  # Wait for health check
+docker inspect health-test | grep -A 10 "Health"
+docker rm -f health-test
+```
+
+**Key Learning:** --chown fixes permissions, npm ci is better for production!
+
+---
+
+## Step 9: Multi-stage Build (Advanced)
+
+Separate build and runtime environments:
+
+```dockerfile
+# Build stage
+FROM node:18-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+
+# Production stage  
+FROM node:18-alpine AS production
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nodejs -u 1001
+WORKDIR /app
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
+COPY --chown=nodejs:nodejs . .
+USER nodejs
+ENV NODE_ENV=production
+EXPOSE 3000
+HEALTHCHECK CMD curl -f http://localhost:3000 || exit 1
+CMD ["node", "app.js"]
+```
+
+**What changed:** Two stages - one for building, one for running
+
+---
+
+## Step 10: Production Ready with All Best Practices
+
+```dockerfile
+# Build stage
+FROM node:18-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production && npm cache clean --force
+
+# Production stage
+FROM node:18-alpine AS production
+
+# Install security updates and dumb-init
+RUN apk add --no-cache dumb-init curl
+
+# Create user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001
+
+# Set working directory
+WORKDIR /app
+
+# Copy from builder stage
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
+COPY --chown=nodejs:nodejs . .
+
+# Switch to non-root user
+USER nodejs
+
+# Environment variables
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# Expose port
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:3000/health || exit 1
+
+# Use dumb-init for proper signal handling
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["node", "app.js"]
+```
+
+**What changed:** Added signal handling, security updates, optimized RUN commands
+
+---
+
+## Quick Commands Summary:
+
+```bash
+# Build and run each version:
+docker build -t hello-world-v[1-10] .
+docker run hello-world-v[1-10]
+
+# Interactive exploration:
+docker run -it hello-world-v[1-10] /bin/bash  # or /bin/sh for Alpine
+docker run -it hello-world-v[1-10] /bin/sh    # for Alpine versions
+
+# Compare image sizes:
+docker images | grep hello-world
+
+# Clean up when done:
+docker rmi hello-world-v1 hello-world-v2 hello-world-v3 # etc...
+```
+
+## 🎯 Key Learning Points:
+
+1. **Start simple** - 3 lines can run any Node.js app
+2. **WORKDIR organizes** - keeps files in proper directories  
+3. **Layer caching** - Order matters! Put changing stuff last
+4. **Environment variables** - ENV sets defaults, -e overrides
+5. **Alpine = smaller** - but use /bin/sh instead of /bin/bash
+6. **Security matters** - never run as root in production
+7. **File ownership** - use --chown to fix permissions
+8. **npm ci > npm install** - for production builds
+
+## 🚀 Try This Progression:
+1. Start with Step 1 - see it work
+2. Compare each step with the previous one using -it
+3. Notice the differences in size, security, and functionality
+4. By Step 8, you understand all major Docker concepts!
+
+**Pro Tip:** After each step, run `docker run -it [image-name] /bin/sh` to explore what's inside!
+
+
