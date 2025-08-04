@@ -107,8 +107,6 @@ Now we will list all the necessary commands here . You can run them on your term
 
 # Create Your own docker image
 
-# Docker Tutorial - From Zero to Hero
-
 ## Step 1: Minimal Dockerfile (3 lines)
 
 The absolute simplest Dockerfile to run our hello world:
