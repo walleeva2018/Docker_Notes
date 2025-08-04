@@ -612,22 +612,6 @@ docker images | grep hello-world
 docker rmi hello-world-v1 hello-world-v2 hello-world-v3 # etc...
 ```
 
-## 🎯 Key Learning Points:
-
-1. **Start simple** - 3 lines can run any Node.js app
-2. **WORKDIR organizes** - keeps files in proper directories  
-3. **Layer caching** - Order matters! Put changing stuff last
-4. **Environment variables** - ENV sets defaults, -e overrides
-5. **Alpine = smaller** - but use /bin/sh instead of /bin/bash
-6. **Security matters** - never run as root in production
-7. **File ownership** - use --chown to fix permissions
-8. **npm ci > npm install** - for production builds
-
-## 🚀 Try This Progression:
-1. Start with Step 1 - see it work
-2. Compare each step with the previous one using -it
-3. Notice the differences in size, security, and functionality
-4. By Step 8, you understand all major Docker concepts!
 
 **Pro Tip:** After each step, run `docker run -it [image-name] /bin/sh` to explore what's inside!
 
